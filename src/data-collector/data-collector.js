@@ -1,7 +1,7 @@
 /* constants:true*/
 
 import jstz from 'jstz';
-import { ENV } from 'paypal-sdk-constants';
+import { isLocalStorageEnabled } from 'belter/src';
 
 import { constants } from './constants';
 
@@ -11,7 +11,7 @@ import { constants } from './constants';
 * fraudnet-version, flash version, timezone details, checksum, spoof-flag,
 * true-browser
 */
-export function collectRiskData(clientMetadataID, env) {
+export function collectRiskData(clientMetadataID, appSourceID) {
     const payload = {};
     let checkSumString = '';
     const timezone = jstz.determine();
@@ -42,22 +42,8 @@ export function collectRiskData(clientMetadataID, env) {
     */
     const _setCookiesDataOnPayload = function() {
         // default values null - if no supercookies are found
-        payload.cookies = [];
-        payload.cookies[constants.SC_COOKIE] = null;
-        let vidCookieName = '';
-        if (env === ENV.PRODUCTION) {
-            vidCookieName = constants.VID_COOKIE_PROD;
-        } else {
-            vidCookieName = constants.VID_COOKIE;
-        }
-        // window.localStorage.setItem(vidCookieName, 'anish');
-        payload.cookies[vidCookieName] = null;
-        // checking if local storage exists
-        if (window.localStorage.getItem(constants.SC_COOKIE)) {
-            payload.cookies.push({ [constants.SC_COOKIE]: window.localStorage.getItem(constants.SC_COOKIE) });
-        }
-        if (window.localStorage.getItem(vidCookieName)) {
-            payload.cookies.push({ [vidCookieName]: window.localStorage.getItem(vidCookieName) });
+        if (isLocalStorageEnabled() && window.localStorage.getItem(constants.localStorageRiskData)) {
+            payload.localStorageRiskData = window.localStorage.getItem(constants.localStorageRiskData);
         }
     };
 
@@ -548,6 +534,7 @@ export function collectRiskData(clientMetadataID, env) {
 
     return {
         correlationId: clientMetadataID,
+        appId:         appSourceID,
         payload:       p1Payload
     };
 }

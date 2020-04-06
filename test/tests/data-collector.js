@@ -3,9 +3,9 @@ import { collectRiskData } from '../../src/data-collector/data-collector';
 
 describe('risk data collector cases', () => {
     const correlationId = 'testCMID';
-    const env = 'stage'; // 'production';
+    const appSourceID = 'SMART_PAYMENT_BUTTONS';
 
-    const payPalRiskData =  collectRiskData(correlationId, env);
+    const payPalRiskData =  collectRiskData(correlationId, appSourceID);
     console.log('should success', JSON.stringify(payPalRiskData));// eslint-disable-line no-console
 
     it('should successfully include correlation ID in payload ', () => {

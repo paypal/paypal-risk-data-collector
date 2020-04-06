@@ -3,15 +3,13 @@
 * Persist risk data: save the cookies returned from backend in localstorage
 *
 */
+
+import { isLocalStorageEnabled } from 'belter/src';
+
+import { constants } from './constants';
+
 export function persistRiskData(riskDataCookies) {
-    if (riskDataCookies) {
-        riskDataCookies.forEach(cookie => {
-            for (const key in cookie) {
-                if (cookie.hasOwnProperty(key)) {
-                    // console.log(`${ key  } -> ${  cookie[key] }`);// eslint-disable-line no-console
-                    window.localStorage.setItem(key, cookie[key]);
-                }
-            }
-        });
+    if (isLocalStorageEnabled() && riskDataCookies) {
+        window.localStorage.setItem(constants.localStorageRiskData, riskDataCookies);
     }
 }

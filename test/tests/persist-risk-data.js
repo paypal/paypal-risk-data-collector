@@ -1,25 +1,19 @@
+/* eslint max-lines: off */
+
+import { isLocalStorageEnabled } from 'belter/src';
+
 import { persistRiskData } from '../../src/data-collector/persist-risk-data';
+import { constants } from '../../src/data-collector/constants';
+
 
 describe('persist risk data cases', () => {
-
-    const cookiesData =  [
-        {
-            sc_f: '6ZHwyYl4qvckMV4uZVVQLTOeMuTGRnpXtR126X8xcaMqGAfffdW1zJzS-9ypHtOrlnCjltXKBLrhxoYITpM9TIL8pYKglzcvigixWG;Domain=c.paypal.com;Max-Age=157680000;Path=/;Secure;Version=1;Expires=Sun, 30-Mar-2025 23:06:16 GMT; HttpOnly'
-        },
-        {
-            UGZUWCKM6F_awXE8WyEURJrBYQG: 'ahW44aQnP6r9zG7SjSgRqjzNYJ317vUyKYeVthfZBUu6BvCTvXUQ104-W7ZKXk7wMhKWLMZAozP71Pm3;Domain=.paypal.com;Max-Age=630720000;Path=/;Secure;Version=1;Expires=Mon, 26-Mar-2040 23:06:16 GMT; HttpOnly'
-        }
-    ];
+    const cookiesData = 'sc_f=MyNj1ZMuHH7ycH-;Domain=c.paypal.com;Max-Age=157680000;Path=/;Secure;Version=1;Expires=Wed, UGZUWCKM6F_awXE8WyEURJrBYQG=NSZp9DW0Evk_i;Domain=.paypal.com;Max-Age=630720000;Path=/;Secure;Version=1;Expires=Thu';
     persistRiskData(cookiesData);
     it('should successfully get cookies from localstorage ', () => {
-        cookiesData.forEach(cookie => {
-            for (const key in cookie) {
-                if (cookie.hasOwnProperty(key)) {
-                    if (cookie[key] !== window.localStorage.getItem(key)) {
-                        throw new Error(`Expected cookie[key] to be ${ window.localStorage.getItem(key)  }, got ${ window.localStorage.getItem(key) }`);
-                    }
-                }
+        if (isLocalStorageEnabled()) {
+            if (cookiesData !== window.localStorage.getItem(constants.localStorageRiskData)) {
+                throw new Error(`Expected cookiesData to be ${ window.localStorage.getItem(constants.localStorageRiskData)  }, got ${ window.localStorage.getItem(constants.localStorageRiskData) }`);
             }
-        });
+        }
     });
 });
