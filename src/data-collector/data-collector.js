@@ -1,6 +1,5 @@
 /* constants:true*/
 
-import jstz from 'jstz';
 import { isLocalStorageEnabled } from 'belter/src';
 
 import { constants } from './constants';
@@ -11,10 +10,9 @@ import { constants } from './constants';
 * fraudnet-version, flash version, timezone details, checksum, spoof-flag,
 * true-browser
 */
-export function collectRiskData(clientMetadataID, appSourceID) {
+export function collectRiskData({ clientMetadataID, appSourceID }) {
     const payload = {};
     let checkSumString = '';
-    const timezone = jstz.determine();
     const fraudnetStart = Date.now();
     const p1Start = Date.now();
 
@@ -236,7 +234,9 @@ export function collectRiskData(clientMetadataID, appSourceID) {
         // inverting positive and negative, see
         // https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset
         payload.tz = -(new Date().getTimezoneOffset() * 60000);
-        payload.tzName = timezone.name();
+        if (Intl.DateTimeFormat() && Intl.DateTimeFormat().resolvedOptions() && Intl.DateTimeFormat().resolvedOptions().timeZone) {
+            payload.tzName =  Intl.DateTimeFormat().resolvedOptions().timeZone;
+        }
         _addToChecksumString(payload.tzName);
         payload.dst = true;
     };
