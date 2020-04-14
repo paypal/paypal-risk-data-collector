@@ -1,8 +1,14 @@
+/* @flow */
 /* constants:true*/
 
 import { isLocalStorageEnabled } from 'belter/src';
 
 import { constants } from './constants';
+
+type CollectRiskDataOptions = {|
+    clientMetadataID : string,
+    appSourceID : string
+|};
 
 /**
 *
@@ -10,7 +16,7 @@ import { constants } from './constants';
 * fraudnet-version, flash version, timezone details, checksum, spoof-flag,
 * true-browser
 */
-export function collectRiskData({ clientMetadataID, appSourceID }) {
+export function collectRiskData({ clientMetadataID, appSourceID } : CollectRiskDataOptions) : Object {
     const payload = {};
     let checkSumString = '';
     const fraudnetStart = Date.now();
@@ -31,7 +37,7 @@ export function collectRiskData({ clientMetadataID, appSourceID }) {
     /**
     * Concatenates an element to the checksum string.
     */
-    const _addToChecksumString = function(string) {
+    const _addToChecksumString = function(string : string) {
         checkSumString += string;
     };
 
@@ -237,7 +243,9 @@ export function collectRiskData({ clientMetadataID, appSourceID }) {
         if (Intl.DateTimeFormat() && Intl.DateTimeFormat().resolvedOptions() && Intl.DateTimeFormat().resolvedOptions().timeZone) {
             payload.tzName =  Intl.DateTimeFormat().resolvedOptions().timeZone;
         }
-        _addToChecksumString(payload.tzName);
+        if (payload.tzName) {
+            _addToChecksumString(payload.tzName);
+        }
         payload.dst = true;
     };
 
@@ -250,7 +258,7 @@ export function collectRiskData({ clientMetadataID, appSourceID }) {
     */
     const _setP1TimingDetails = function() {
         const preP1PostTime = Date.now();
-        _addToChecksumString(preP1PostTime);
+        _addToChecksumString(preP1PostTime.toString());
         payload.time = preP1PostTime;
 
         payload.pt1 = {
@@ -422,6 +430,7 @@ export function collectRiskData({ clientMetadataID, appSourceID }) {
             if ((window.opr && window.opr.addons) || window.opera) {
                 return 2;
             }
+            // $FlowFixMe
             if (typeof InstallTrigger !== 'undefined') {
                 if (typeof window.orientation !== 'undefined') {
                     return 10;
@@ -467,10 +476,12 @@ export function collectRiskData({ clientMetadataID, appSourceID }) {
                 return 7;
             }
             const isSafari = (typeof document !== 'undefined' &&
+                    // $FlowFixMe
                     typeof document.onwebkitmouseforcechanged !== 'undefined') ||
                     typeof window.webkitNotifications !== 'undefined' ||
                     Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
             if (isSafari) {
+                // $FlowFixMe
                 const isMobileS = typeof navigator.standalone !== 'undefined' &&
                     typeof window.orientation !== 'undefined';
                 if (!isMobileS) {
@@ -523,8 +534,11 @@ export function collectRiskData({ clientMetadataID, appSourceID }) {
         _setP1TimingDetails();
 
         (function _setPt1MiscFields() {
+            // $FlowFixMe
             payload.pt1.ph1 = _generateChecksum();
+            // $FlowFixMe
             payload.pt1.sf = _generateSpoofFlag();
+            // $FlowFixMe
             payload.pt1.tb = _setTrueBrowser();
         }());
         return payload;
