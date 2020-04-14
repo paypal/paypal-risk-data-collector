@@ -1,13 +1,13 @@
 /* constants:true*/
 import { isLocalStorageEnabled } from 'belter/src';
 import { constants } from './constants';
+
 /**
 *
 * Collects P1 risk data: navigator, window, & screen fields, referrer URL, activeXDefined,
 * fraudnet-version, flash version, timezone details, checksum, spoof-flag,
 * true-browser
 */
-
 export function collectRiskData(_ref) {
   var clientMetadataID = _ref.clientMetadataID,
       appSourceID = _ref.appSourceID;
@@ -203,7 +203,9 @@ export function collectRiskData(_ref) {
       payload.tzName = Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
 
-    _addToChecksumString(payload.tzName);
+    if (payload.tzName) {
+      _addToChecksumString(payload.tzName);
+    }
 
     payload.dst = true;
   };
@@ -219,7 +221,7 @@ export function collectRiskData(_ref) {
   var _setP1TimingDetails = function _setP1TimingDetails() {
     var preP1PostTime = Date.now();
 
-    _addToChecksumString(preP1PostTime);
+    _addToChecksumString(preP1PostTime.toString());
 
     payload.time = preP1PostTime;
     payload.pt1 = {
@@ -389,7 +391,8 @@ export function collectRiskData(_ref) {
     try {
       if (window.opr && window.opr.addons || window.opera) {
         return 2;
-      }
+      } // $FlowFixMe
+
 
       if (typeof InstallTrigger !== 'undefined') {
         if (typeof window.orientation !== 'undefined') {
@@ -433,9 +436,11 @@ export function collectRiskData(_ref) {
         return 7;
       }
 
-      var isSafari = typeof document !== 'undefined' && typeof document.onwebkitmouseforcechanged !== 'undefined' || typeof window.webkitNotifications !== 'undefined' || Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+      var isSafari = typeof document !== 'undefined' && // $FlowFixMe
+      typeof document.onwebkitmouseforcechanged !== 'undefined' || typeof window.webkitNotifications !== 'undefined' || Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
 
       if (isSafari) {
+        // $FlowFixMe
         var isMobileS = typeof navigator.standalone !== 'undefined' && typeof window.orientation !== 'undefined';
 
         if (!isMobileS) {
@@ -495,8 +500,11 @@ export function collectRiskData(_ref) {
     _setP1TimingDetails();
 
     (function _setPt1MiscFields() {
-      payload.pt1.ph1 = _generateChecksum();
-      payload.pt1.sf = _generateSpoofFlag();
+      // $FlowFixMe
+      payload.pt1.ph1 = _generateChecksum(); // $FlowFixMe
+
+      payload.pt1.sf = _generateSpoofFlag(); // $FlowFixMe
+
       payload.pt1.tb = _setTrueBrowser();
     })();
 
