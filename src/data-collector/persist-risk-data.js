@@ -10,7 +10,11 @@ import { isLocalStorageEnabled } from 'belter/src';
 
 import { constants } from './constants';
 
-export function persistRiskData(riskDataCookies) {
+type PersistRiskData = {|
+    cookies? : string
+|};
+
+export function persistRiskData(riskDataCookies : PersistRiskData) {
     if (isLocalStorageEnabled() && riskDataCookies && riskDataCookies.cookies) {
         window.localStorage.setItem(constants.localStorageRiskData, riskDataCookies.cookies);
     }
